@@ -17,16 +17,16 @@
   <script src="js/controllers.js"></script>
   <script src="js/filters.js"></script>
   <script src="js/services.js"></script>
-  
+
   <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.11/css/jquery.dataTables.css">
   <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.11/js/jquery.dataTables.js"></script>
-  
+
   <script>
 		// Testing data
 		var dataSet = [
 				[ "Ramnath Suthakar", "1737.60", "2352.00", "74%", "67%"],
 				[ "Test User", "1737.60", "2352.00", "74%", "67%"]
-		];	
+		];
   </script>
 
 
@@ -39,24 +39,24 @@
     	<h3 class="panel-title">10,000 ft List</h3>
   		</div>
 		<div class="panel-body">
-			
-			<div ng-app="phonecatControllers" ng-controller="PhoneListCtrl"> 
+
+			<div ng-app="phonecatControllers" ng-controller="PhoneListCtrl">
 				<table id="10000fttable" class="display" width="100%"></table>
 			</div>
-			
+
 			<script>
 				var app = angular.module('phonecatControllers', []);
 				app.controller('PhoneListCtrl', function($scope, $http) {
 					$http({
 						method : "GET",
-						url : "https://api.10000ft.com/api/v1/projects/643402/users?with_archived=true&with_phases=true",
-						headers: { 'auth':'d2JEUHpVaHczeThucVpLLzZqNWZkc1EvWjc4THlWZUYzZVAxbEJqT3lCLzRSbzN6NUEyQ3NNZUdFVjhlCnRJTFRNWWErbmtQcDhTTEpKU3F3WUEzTFNMZGpGci83STlKMHJlNFo0cGpTcS9acUtKa0w0N2RGZ1p1VgpNcms0SXJ4YQo'},	
+						url : "https://api.10000ft.com/api/v1/projects/656724/users?fields=assignments&per_page=200",
+						headers: { 'auth':'d2JEUHpVaHczeThucVpLLzZqNWZkc1EvWjc4THlWZUYzZVAxbEJqT3lCLzRSbzN6NUEyQ3NNZUdFVjhlCnRJTFRNWWErbmtQcDhTTEpKU3F3WUEzTFNMZGpGci83STlKMHJlNFo0cGpTcS9acUtKa0w0N2RGZ1p1VgpNcms0SXJ4YQo'},
 					}).then(function mySucces(response) {
-						
+
 						//$scope.myWelcome = response.data.data;
 						var arrayLength = response.data.data.length;
 						for (var i=0; i < arrayLength; i++) {
-						
+
 							var itemGen = [response.data.data[i].first_name + " " + response.data.data[i].last_name,"1737.60","2352.00","74%",response.data.data[i].billability_target+"%"];
 							dataSet.push(itemGen);
 						}
@@ -72,15 +72,15 @@
 										{ title: "Target Utilization" }
 									]
 								} );
-		
+
 							} );
-						
+
 					}, function myError(response) {
 						$scope.myWelcome = response.statusText;
   					});
 				});
 			</script>
-			
+
 
   		</div>
 	</div>
