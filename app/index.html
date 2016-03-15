@@ -2,7 +2,7 @@
 <html lang="en" ng-app="phonecatApp">
 <head>
   <meta charset="utf-8">
-  <title>10,000ft List</title>
+  <title>10,000 ft - API Test</title>
   <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
   <link rel="stylesheet" href="css/app.css">
   <link rel="stylesheet" href="css/animations.css">
@@ -12,6 +12,7 @@
   <script src="bower_components/angular-animate/angular-animate.js"></script>
   <script src="bower_components/angular-route/angular-route.js"></script>
   <script src="bower_components/angular-resource/angular-resource.js"></script>
+  <script src="bower_components/canvasjs/canvasjs.min.js"></script>
   <script src="js/app.js"></script>
   <script src="js/animations.js"></script>
   <script src="js/controllers.js"></script>
@@ -22,31 +23,97 @@
   <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.11/js/jquery.dataTables.js"></script>
   
   <script>
-		// Testing data
-		var dataSet = [
-				[ "Ramnath Suthakar", "1737.60", "2352.00", "74%", "67%"],
-				[ "Test User", "1737.60", "2352.00", "74%", "67%"]
-		];	
+
+	var dataSet = [];
+	var dataTotalHourSet = [];
+	var dataPreviousTotalHourSet = [];	
+	var dataFutureTotalHourSet = [];
+	var totalDay = 0;
+	var hoursTotal = 0;
+
+  </script>
+  
+  
+  <script type="text/javascript">
+	  window.onload = function () {
+			var chart = new CanvasJS.Chart("chartContainer", {
+				title: {
+					text: "",
+					fontFamily: "Verdana",
+					fontColor: "Peru",
+					fontSize: 28
+
+				},
+				animationEnabled: true,
+				axisY: {
+					tickThickness: 0,
+					lineThickness: 0,
+					valueFormatString: " ",
+					gridThickness: 0                    
+				},
+				axisX: {
+					tickThickness: 0,
+					lineThickness: 0,
+					labelFontSize: 18,
+					labelFontColor: "Peru"
+
+				},
+				data: [
+				{
+					indexLabelFontSize: 26,
+					toolTipContent: "<span style='\"'color: {color};'\"'><strong>{indexLabel}</strong></span><span style='\"'font-size: 20px; color:peru '\"'><strong>{y}</strong></span>",
+
+					indexLabelPlacement: "inside",
+					indexLabelFontColor: "white",
+					indexLabelFontWeight: 600,
+					indexLabelFontFamily: "Verdana",
+					color: "#62C9C3",
+					type: "bar",
+					dataPoints: [
+						{ y: 40, label: "40%", indexLabel: "" }
+					]
+				}
+				]
+			});
+
+			chart.render();
+		}
   </script>
 
 
 </head>
 <body>
 
-  <div class="view-container">
+  <div class="view-container" ng-app="phonecatControllers" ng-controller="PhoneListCtrl">
     <div class="panel panel-default">
   		<div class="panel-heading">
-    	<h3 class="panel-title">10,000 ft List</h3>
+    	<h3 class="panel-title">{{projectTitle}}</h3>
   		</div>
 		<div class="panel-body">
 			
-			<div ng-app="phonecatControllers" ng-controller="PhoneListCtrl"> 
-				<table id="10000fttable" class="display" width="100%"></table>
-			</div>
+			<table id="10000fttable" class="display" width="100%"></table>
+			
+			<div id="chartContainer" style="height: 300px; width: 100%;"></div>
 			
 			<script>
 				var app = angular.module('phonecatControllers', []);
 				app.controller('PhoneListCtrl', function($scope, $http) {
+				
+				
+					$http({
+						method : "GET",
+						url : "https://api.10000ft.com/api/v1/projects/643402",
+						headers: { 'auth':'d2JEUHpVaHczeThucVpLLzZqNWZkc1EvWjc4THlWZUYzZVAxbEJqT3lCLzRSbzN6NUEyQ3NNZUdFVjhlCnRJTFRNWWErbmtQcDhTTEpKU3F3WUEzTFNMZGpGci83STlKMHJlNFo0cGpTcS9acUtKa0w0N2RGZ1p1VgpNcms0SXJ4YQo'},	
+					}).then(function mySucces(response) {
+						
+						$scope.projectTitle = response.data.name;
+						
+					}, function myError(response) {
+						$scope.myWelcome = response.statusText;
+  					});
+  					
+				
+					
 					$http({
 						method : "GET",
 						url : "https://api.10000ft.com/api/v1/projects/643402/users?with_archived=true&with_phases=true",
@@ -55,25 +122,138 @@
 						
 						//$scope.myWelcome = response.data.data;
 						var arrayLength = response.data.data.length;
+						
 						for (var i=0; i < arrayLength; i++) {
 						
-							var itemGen = [response.data.data[i].first_name + " " + response.data.data[i].last_name,"1737.60","2352.00","74%",response.data.data[i].billability_target+"%"];
+							var displayName = response.data.data[i].display_name;
+							var billability_target = response.data.data[i].billability_target;
+							var itemGen = [displayName,hoursTotal,"2352.00","74%",billability_target+"%", response.data.data[i].id];
 							dataSet.push(itemGen);
 						}
+						
+						
+						for (var k=0; k < dataSet.length; k++) {
+						
+							var userData = dataSet[k];
+						
+							$http({
+								method : "GET",
+								url : "https://api.10000ft.com/api/v1/users/" + userData[5] + "/time_entries?from=2016-03-07&to=2016-03-11",
+								headers: { 'auth':'d2JEUHpVaHczeThucVpLLzZqNWZkc1EvWjc4THlWZUYzZVAxbEJqT3lCLzRSbzN6NUEyQ3NNZUdFVjhlCnRJTFRNWWErbmtQcDhTTEpKU3F3WUEzTFNMZGpGci83STlKMHJlNFo0cGpTcS9acUtKa0w0N2RGZ1p1VgpNcms0SXJ4YQo'},	
+							}).then(function mySucces(responseDay) {
+							
+								totalDay = responseDay.data.data.length;
+								for (var j=0; j < totalDay; j++) {
+									if(j == 0) {
+										hoursTotal = 0;
+									}
+									hoursTotal += parseInt(responseDay.data.data[j].hours);
+								}
+								
+								//var itemGen2 = [hoursTotal];
+								dataTotalHourSet.push(hoursTotal);
+	
+							}, function myError(responseDay) {
+						
+							});
+							
+						}
+						
+						
+						
+						for (var k=0; k < dataSet.length; k++) {
+						
+							var userData = dataSet[k];
+						
+							$http({
+								method : "GET",
+								url : "https://api.10000ft.com/api/v1/users/" + userData[5] + "/time_entries?from=2016-02-29&to=2016-03-04",
+								headers: { 'auth':'d2JEUHpVaHczeThucVpLLzZqNWZkc1EvWjc4THlWZUYzZVAxbEJqT3lCLzRSbzN6NUEyQ3NNZUdFVjhlCnRJTFRNWWErbmtQcDhTTEpKU3F3WUEzTFNMZGpGci83STlKMHJlNFo0cGpTcS9acUtKa0w0N2RGZ1p1VgpNcms0SXJ4YQo'},	
+							}).then(function mySucces(responseDay) {
+							
+								totalDay = responseDay.data.data.length;
+								for (var j=0; j < totalDay; j++) {
+									if(j == 0) {
+										hoursTotal = 0;
+									}
+									hoursTotal += parseInt(responseDay.data.data[j].hours);
+								}
+								
+								
+								dataPreviousTotalHourSet.push(hoursTotal);
+	
+							}, function myError(responseDay) {
+						
+							});
+							
+						}
+						
+						
+						
+						for (var k=0; k < dataSet.length; k++) {
+						
+							var userData = dataSet[k];
+						
+							$http({
+								method : "GET",
+								url : "https://api.10000ft.com/api/v1/users/" + userData[5] + "/time_entries?from=2016-03-21&to=2016-03-25",
+								headers: { 'auth':'d2JEUHpVaHczeThucVpLLzZqNWZkc1EvWjc4THlWZUYzZVAxbEJqT3lCLzRSbzN6NUEyQ3NNZUdFVjhlCnRJTFRNWWErbmtQcDhTTEpKU3F3WUEzTFNMZGpGci83STlKMHJlNFo0cGpTcS9acUtKa0w0N2RGZ1p1VgpNcms0SXJ4YQo'},	
+							}).then(function mySucces(responseDay) {
+							
+								totalDay = responseDay.data.data.length;
+								for (var j=0; j < totalDay; j++) {
+									if(j == 0) {
+										hoursTotal = 0;
+									}
+									hoursTotal += parseInt(responseDay.data.data[j].hours);
+								}
+								
+								
+								dataFutureTotalHourSet.push(hoursTotal);
+	
+							}, function myError(responseDay) {
+						
+							});
+							
+						}
+						
+						var delay=3000; // 3 seconds
 
-						$(document).ready(function() {
-								$('#10000fttable').DataTable( {
-									data: dataSet,
-									columns: [
-										{ title: "Discipline" },
-										{ title: "Actual Hours" },
-										{ title: "Available Hours" },
-										{ title: "Utilization" },
-										{ title: "Target Utilization" }
-									]
-								} );
+						setTimeout(function(){
+							var teamTotalHour = 0;
+							for (var r=0; r < dataSet.length; r++) {
+								var itemArrayInfo = dataSet[r];
+								teamTotalHour += dataTotalHourSet[r]+dataFutureTotalHourSet[r];
+							}
+							
+							
+							for (var r=0; r < dataSet.length; r++) {
+						
+								var itemArrayInfo = dataSet[r];
+								//teamTotalHour += dataTotalHourSet[r]+dataFutureTotalHourSet[r];
+								var persentage = ((dataTotalHourSet[r]+dataFutureTotalHourSet[r])/teamTotalHour)*100;
+								var itemGen3 = [itemArrayInfo[0],dataTotalHourSet[r],dataPreviousTotalHourSet[r],dataFutureTotalHourSet[r],dataTotalHourSet[r]+dataFutureTotalHourSet[r], persentage.toFixed(2)];
+								dataSet[r] = itemGen3;
+							
+							}
+						
+
+						  $(document).ready(function() {
+									$('#10000fttable').DataTable( {
+										data: dataSet,
+										columns: [
+											{ title: "NAME" },
+											{ title: "Incurred" },
+											{ title: "Difference from past" },
+											{ title: "Future Scheduled" },
+											{ title: "Total" },
+											{ title: "Chart" }
+										]
+									} );
 		
-							} );
+								} );
+						}, delay); 
+						
 						
 					}, function myError(response) {
 						$scope.myWelcome = response.statusText;
