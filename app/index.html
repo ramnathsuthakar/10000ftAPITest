@@ -56,8 +56,8 @@
 						//$scope.myWelcome = response.data.data;
 						var arrayLength = response.data.data.length;
 						for (var i=0; i < arrayLength; i++) {
-
-							var itemGen = [response.data.data[i].first_name + " " + response.data.data[i].last_name,"1737.60","2352.00","74%",response.data.data[i].billability_target+"%"];
+              var dg = response.data.data[i].data;
+							var itemGen = [response.data.data[i].first_name + " " + response.data.data[i].last_name, dg.starts_at,"2352.00","74%",response.data.data[i].billability_target+"%"];
 							dataSet.push(itemGen);
 						}
 
@@ -65,8 +65,8 @@
 								$('#10000fttable').DataTable( {
 									data: dataSet,
 									columns: [
-										{ title: "Discipline" },
-										{ title: "Actual Hours" },
+										{ title: "Name" },
+										{ title: "Start Date" },
 										{ title: "Available Hours" },
 										{ title: "Utilization" },
 										{ title: "Target Utilization" }
