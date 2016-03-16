@@ -41,6 +41,7 @@
 		<div class="panel-body">
 
 			<div ng-app="phonecatControllers" ng-controller="PhoneListCtrl">
+				<h3>{{myTest}}</h3>
 				<table id="10000fttable" class="display" width="100%"></table>
 			</div>
 
@@ -53,11 +54,12 @@
 						headers: { 'auth':'d2JEUHpVaHczeThucVpLLzZqNWZkc1EvWjc4THlWZUYzZVAxbEJqT3lCLzRSbzN6NUEyQ3NNZUdFVjhlCnRJTFRNWWErbmtQcDhTTEpKU3F3WUEzTFNMZGpGci83STlKMHJlNFo0cGpTcS9acUtKa0w0N2RGZ1p1VgpNcms0SXJ4YQo'},
 					}).then(function mySucces(response) {
 
-						//$scope.myWelcome = response.data.data;
+						var data1 = response.data.data[0];
+						var data2 = data1.assignments.data[0];
+						$scope.myTest = data2.starts_at;
 						var arrayLength = response.data.data.length;
 						for (var i=0; i < arrayLength; i++) {
-              var dg = response.data.data[i].data;
-							var itemGen = [response.data.data[i].first_name + " " + response.data.data[i].last_name, "ssdsd","2352.00","74%",response.data.data[i].billability_target+"%"];
+							var itemGen = [response.data.data[i].first_name + " " + response.data.data[i].last_name, data2.starts_at,"2352.00","74%",response.data.data[i].billability_target+"%"];
 							dataSet.push(itemGen);
 						}
 
