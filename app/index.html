@@ -99,10 +99,11 @@
 				var app = angular.module('phonecatControllers', []);
 				app.controller('PhoneListCtrl', function($scope, $http) {
 				
+				//643402
 				
 					$http({
 						method : "GET",
-						url : "https://api.10000ft.com/api/v1/projects/643402",
+						url : "https://api.10000ft.com/api/v1/projects/858987",
 						headers: { 'auth':'d2JEUHpVaHczeThucVpLLzZqNWZkc1EvWjc4THlWZUYzZVAxbEJqT3lCLzRSbzN6NUEyQ3NNZUdFVjhlCnRJTFRNWWErbmtQcDhTTEpKU3F3WUEzTFNMZGpGci83STlKMHJlNFo0cGpTcS9acUtKa0w0N2RGZ1p1VgpNcms0SXJ4YQo'},	
 					}).then(function mySucces(response) {
 						
@@ -116,7 +117,7 @@
 					
 					$http({
 						method : "GET",
-						url : "https://api.10000ft.com/api/v1/projects/643402/users?with_archived=true&with_phases=true",
+						url : "https://api.10000ft.com/api/v1/projects/858987/users?with_archived=true&from=2016-03-07&to=2016-03-11",
 						headers: { 'auth':'d2JEUHpVaHczeThucVpLLzZqNWZkc1EvWjc4THlWZUYzZVAxbEJqT3lCLzRSbzN6NUEyQ3NNZUdFVjhlCnRJTFRNWWErbmtQcDhTTEpKU3F3WUEzTFNMZGpGci83STlKMHJlNFo0cGpTcS9acUtKa0w0N2RGZ1p1VgpNcms0SXJ4YQo'},	
 					}).then(function mySucces(response) {
 						
@@ -130,6 +131,36 @@
 							var itemGen = [displayName,hoursTotal,"2352.00","74%",billability_target+"%", response.data.data[i].id];
 							dataSet.push(itemGen);
 						}
+						
+						// Clean the duplicate
+						var tempDataSet = dataSet;
+						var finalSet = [];
+  
+						for (var i=0; i < dataSet.length; i++) {
+						  var countAdd = 0;
+						  var itemDataSet = dataSet[i]; 
+						  for (var w=0; w < tempDataSet.length; w++) {
+							var tempDataSetCheck = tempDataSet[w];
+		
+							if(countAdd == 0) {
+							  if(itemDataSet[5] == tempDataSetCheck[5]) {
+								finalSet.push(itemDataSet);
+								tempDataSet.splice(w, 1);
+								countAdd++;
+							  }
+							} else {
+								if(itemDataSet[5] == tempDataSetCheck[5]) {
+								tempDataSet.splice(w, 1);
+								dataSet = tempDataSet;
+							  }
+							}
+						  }
+						}
+						
+						dataSet = finalSet;
+						
+						//$scope.projectTitle = finalSet;
+						
 						
 						
 						for (var k=0; k < dataSet.length; k++) {
@@ -232,7 +263,7 @@
 								var itemArrayInfo = dataSet[r];
 								//teamTotalHour += dataTotalHourSet[r]+dataFutureTotalHourSet[r];
 								var persentage = ((dataTotalHourSet[r]+dataFutureTotalHourSet[r])/teamTotalHour)*100;
-								var itemGen3 = [itemArrayInfo[0],dataTotalHourSet[r],dataPreviousTotalHourSet[r],dataFutureTotalHourSet[r],dataTotalHourSet[r]+dataFutureTotalHourSet[r], persentage.toFixed(2)];
+								var itemGen3 = [itemArrayInfo[0],dataTotalHourSet[r],dataTotalHourSet[r]-dataPreviousTotalHourSet[r],dataFutureTotalHourSet[r],dataTotalHourSet[r]+dataFutureTotalHourSet[r], persentage.toFixed(2)];
 								dataSet[r] = itemGen3;
 							
 							}
